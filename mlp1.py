@@ -4,6 +4,8 @@ import loglinear as ll
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
 
+PRECISION = 1e-4
+
 def classifier_output(x, params):
     # YOUR CODE HERE.
     W = params[0]
@@ -44,7 +46,7 @@ def loss_and_gradients(x, y, params):
     y_one_hot[y] = 1
     gb_tag = -(y_one_hot-probs)
     gU = np.outer(gb_tag, np.tanh(np.dot(W,x)+b))
-    gb = np.dot(np.dot(gb_tag, U), (1-np.power(np.tanh(np.dot(W,x)+b),2)))
+    gb = np.dot(gb_tag, U) * (1-np.square(np.tanh(np.dot(W,x)+b)))
     gW = np.outer(gb,x)
     loss = -np.log(probs[y])
 
@@ -59,9 +61,9 @@ def create_classifier(in_dim, hid_dim, out_dim):
     return:
     a flat list of 4 elements, W, b, U, b_tag.
     """
-    W = np.zeros(hid_dim, in_dim)
-    b = np.zeros(hid_dim)
-    U = np.zeros(out_dim,hid_dim)
-    b_tag = np.zeros(out_dim)
+    W = np.random.uniform(-PRECISION,PRECISION,[hid_dim, in_dim])
+    b = np.random.uniform(-PRECISION,PRECISION,hid_dim)
+    U = np.random.uniform(-PRECISION,PRECISION,[out_dim, hid_dim])
+    b_tag = np.random.uniform(-PRECISION,PRECISION,out_dim)
     params = [W,b,U,b_tag]
     return params

@@ -1,4 +1,4 @@
-import loglinear as ll
+import mlp1 as ml
 import utils as ut
 import random
 import numpy as np
@@ -8,6 +8,7 @@ STUDENT = {'name': 'YOUR NAME',
 
 EPOCHS = 40
 ETA = 0.05
+HIDDEN_SIZE = 50
 
 def feats_to_vec(features):
     # YOUR CODE HERE.
@@ -30,7 +31,7 @@ def accuracy_on_dataset(dataset, params):
         # accuracy is (correct_predictions / all_predictions)
         x = feats_to_vec(features)  # convert features to a vector.
         y = ut.L2I[label]  # convert the label to number if needed.
-        y_hat = ll.predict(x,params)
+        y_hat = ml.predict(x,params)
         if (y==y_hat):
             good +=1
         else:
@@ -55,13 +56,15 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
         for label, features in train_data:
             x = feats_to_vec(features)  # convert features to a vector.
             y = ut.L2I[label]  # convert the label to number if needed.
-            loss, grads = ll.loss_and_gradients(x, y, params)
+            loss, grads = ml.loss_and_gradients(x, y, params)
             cum_loss += loss
             # YOUR CODE HERE
             # update the parameters according to the gradients
             # and the learning rate.
             params[0] -=learning_rate*grads[0]
             params[1] -=learning_rate*grads[1]
+            params[2] -=learning_rate*grads[2]
+            params[3] -=learning_rate*grads[3]
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params)
@@ -73,7 +76,7 @@ def run_test(test_data, params):
     pred_file = open("test.pred", 'w')
     for label, features in test_data:
         x = feats_to_vec(features)  # convert features to a vector.
-        y_hat = ll.predict(x, params)
+        y_hat = ml.predict(x, params)
         #label = [label for label, num in ut.L2I.iteritems() if num == y_hat][0]
         for key, val in ut.L2I.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
             if val == y_hat:
@@ -88,6 +91,6 @@ if __name__ == '__main__':
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
 
-    params = ll.create_classifier(len(ut.F2I), len(ut.L2I))
+    params = ml.create_classifier(len(ut.F2I), HIDDEN_SIZE,len(ut.L2I))
     trained_params = train_classifier(ut.TRAIN, ut.DEV, EPOCHS, ETA, params)
     run_test(ut.TRAIN,trained_params)
