@@ -65,5 +65,6 @@ def create_classifier(in_dim, hid_dim, out_dim):
     b = np.random.uniform(-PRECISION,PRECISION,hid_dim)
     U = np.random.uniform(-PRECISION,PRECISION,[out_dim, hid_dim])
     b_tag = np.random.uniform(-PRECISION,PRECISION,out_dim)
+
     params = [W,b,U,b_tag]
     return params

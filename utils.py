@@ -11,9 +11,17 @@ def read_data(fname):
 def text_to_bigrams(text):
     return ["%s%s" % (c1,c2) for c1,c2 in zip(text,text[1:])]
 
+
+def text_to_unigrams(text):
+    return ["%s" % (c1) for c1 in text]
+
 TRAIN = [(l,text_to_bigrams(t)) for l,t in read_data("train")]
 DEV   = [(l,text_to_bigrams(t)) for l,t in read_data("dev")]
 TEST   = [(l,text_to_bigrams(t)) for l,t in read_data("test")]
+
+# TRAIN = [(l,text_to_unigrams(t)) for l,t in read_data("train")]
+# DEV   = [(l,text_to_unigrams(t)) for l,t in read_data("dev")]
+# TEST   = [(l,text_to_unigrams(t)) for l,t in read_data("test")]
 
 from collections import Counter
 
@@ -23,8 +31,15 @@ for l,feats in TRAIN:
 
 # 600 most common bigrams in the training set.
 vocab = set([x for x,c in fc.most_common(600)])
+#vocab = set([x for x,c in fc.most_common(30)])
 
 # label strings to IDs
 L2I = {l:i for i,l in enumerate(list(sorted(set([l for l,t in TRAIN]))))}
 # feature strings (bigrams) to IDs
 F2I = {f:i for i,f in enumerate(list(sorted(vocab)))}
+
+XOR = [(0,[0,0]),
+        (1,[0,1]),
+        (1,[1,0]),
+        (0,[1,1])]
+
