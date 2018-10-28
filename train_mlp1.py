@@ -8,7 +8,7 @@ STUDENT = {'name': 'YOUR NAME',
 
 EPOCHS = 40
 ETA = 0.05
-HIDDEN_SIZE = 50
+HIDDEN_SIZE = 20
 
 def feats_to_vec(features):
     # YOUR CODE HERE.
