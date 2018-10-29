@@ -3,6 +3,9 @@ import loglinear as ll
 
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
+PRECISION = 1e-4
+h_s = []
+z_s = []
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
@@ -10,8 +13,12 @@ def classifier_output(x, params):
     h = x
     for i in range(0,len(params),2):
         z = np.dot(params[i],h) +params[i+1]
+        z_s.append(z)
         h = np.tanh(z)
+        h_s.append(h)
+    h_s.pop()
     probs = ll.softmax(z)
+    z_s.pop()
     return probs
 
 def predict(x, params):
@@ -37,7 +44,35 @@ def loss_and_gradients(x, y, params):
     # YOU CODE HERE
     probs = classifier_output(x, params)  # pred vec
     loss = -np.log(probs[y])
-    return
+    gradients = []
+    y_one_hot = np.zeros(len(probs))
+    y_one_hot[y] = 1
+    grad_so_far = -(y_one_hot - probs)
+
+    #grad of bn
+    gradients.append(grad_so_far)
+    # grad of wn
+    gradients.append(np.dot(grad_so_far, h_s.pop()))
+    #grad of all params
+
+    for W,b in zip(params, params[1:]):
+        z_i =
+        w_i_plus_one =
+        h_i_minus_one =
+
+        dh_dz = 1-np.square(np.tanh(z_i))
+        dz_dh = w_i_plus_one
+        grad_so_far = np.dot(np.dot(grad_so_far,dh_dz),dz_dh)
+
+
+        dz_dw = h_i_minus_one
+
+
+
+
+    for i in range(len(params)-1, -1, -1):
+    gradients.append(np.dot(grad_so_far,hidden_layers[]))
+    return loss, gradients.reverse()
 
 def create_classifier(dims):
     """
@@ -60,5 +95,8 @@ def create_classifier(dims):
     second layer, and so on.
     """
     params = []
+    for i in range(0,len(dims),2):
+        params[i] = np.random.uniform(-PRECISION, PRECISION,[dims[i],dims[i+1]])
+        params[i+1] = np.random.uniform(-PRECISION,PRECISION,dims[i+1])
     return params
 
