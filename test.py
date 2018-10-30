@@ -8,10 +8,13 @@ print "liz"
 liz = [11,1,22,2,33,3,44,4]
 
 
-la = [num for num in liz if liz.index(num) % 2 ==1]
-le = [num for num in liz if liz.index(num) % 2 ==0]
+la = liz[0:-2:2]
+le = liz[1:-1:2]
 
-for w,b in zip(le,la):
+for w,b in zip(liz[0:-2:2], liz[1:-1:2]):
     print w,b
+
+for i, (W_i, b_i) in enumerate(zip(liz[-2::-2], liz[-1::-2])):
+    print i,W_i,b_i
 
 

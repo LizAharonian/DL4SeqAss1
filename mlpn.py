@@ -9,10 +9,10 @@ z_s = []
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
-    params_copy = params.copy()
     h = x
+    h_s.append(h)
     for i in range(0,len(params),2):
-        z = np.dot(params[i],h) +params[i+1]
+        z = np.dot(h,params[i]) +params[i+1]
         z_s.append(z)
         h = np.tanh(z)
         h_s.append(h)
@@ -52,14 +52,15 @@ def loss_and_gradients(x, y, params):
     #grad of bn
     gradients.append(grad_so_far)
     # grad of wn
-    gradients.append(np.dot(grad_so_far, h_s.pop()))
+    gradients.append(np.outer(grad_so_far, h_s.pop()))
+
     #compute grad of all params
     W_s = [num for num in params if params.index(num) % 2 == 1]
     b_s = [num for num in params if params.index(num) % 2 == 0]
     W_s = W_s.reverse()
     b_s = b_s.reverse()
     index = 0
-    for W,b in zip(W_s, b_s):
+    for W,b in zip(params[0:-2:2], params[1:-1:2]):
         z_i = z_s.pop()
         w_i_plus_one =W_s[index]
         h_i_minus_one = h_s.pop()
@@ -98,9 +99,10 @@ def create_classifier(dims):
     to first layer, then the second two are the matrix and vector from first to
     second layer, and so on.
     """
+    print dims
     params = []
-    for i in range(0,len(dims),2):
-        params[i] = np.random.uniform(-PRECISION, PRECISION,[dims[i],dims[i+1]])
-        params[i+1] = np.random.uniform(-PRECISION,PRECISION,dims[i+1])
+    for dim1,dim2 in zip(dims,dims[1:]):
+        params.append(np.random.uniform(-PRECISION, PRECISION,[dim1,dim2]))
+        params.append(np.random.uniform(-PRECISION,PRECISION,dim2))
     return params
 
