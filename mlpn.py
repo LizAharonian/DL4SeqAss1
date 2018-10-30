@@ -17,8 +17,7 @@ def classifier_output(x, params):
         h = np.tanh(z)
         h_s.append(h)
     h_s.pop()
-    probs = ll.softmax(z)
-    z_s.pop()
+    probs = ll.softmax(z_s.pop())
     return probs
 
 def predict(x, params):
@@ -48,36 +47,38 @@ def loss_and_gradients(x, y, params):
     y_one_hot = np.zeros(len(probs))
     y_one_hot[y] = 1
     grad_so_far = -(y_one_hot - probs)
-
-    #grad of bn
-    gradients.append(grad_so_far)
     # grad of wn
     gradients.append(np.outer(grad_so_far, h_s.pop()))
 
+    #grad of bn
+    gradients.append(np.copy(grad_so_far))
+    print "lizzzzzzzzzz"
     #compute grad of all params
-    W_s = [num for num in params if params.index(num) % 2 == 1]
-    b_s = [num for num in params if params.index(num) % 2 == 0]
-    W_s = W_s.reverse()
-    b_s = b_s.reverse()
-    index = 0
-    for W,b in zip(params[0:-2:2], params[1:-1:2]):
-        z_i = z_s.pop()
-        w_i_plus_one =W_s[index]
-        h_i_minus_one = h_s.pop()
+    for i, (w, b) in enumerate(zip(params[-2::-2], params[-1::-2])):
+        #our params
+        if (len(z_s)!=0):
+            z_i = z_s.pop()
+            w_i_plus_one =w
+            if (len(h_s)!=0):
+                h_i_minus_one = h_s.pop()
+                #calcelate gradients
+                dz_dh = w_i_plus_one
+                dh_dz = 1-np.square(np.tanh(z_i))
+                dz_dw = h_i_minus_one
+                print np.shape(grad_so_far), np.shape(dz_dh), np.shape(dh_dz)
 
-        dz_dh = w_i_plus_one
-        dh_dz = 1-np.square(np.tanh(z_i))
-        grad_so_far = np.dot(np.dot(grad_so_far,dz_dh),dh_dz)
+                grad_so_far = np.dot(grad_so_far,np.transpose(dz_dh)) * dh_dz
 
-        dz_dw = h_i_minus_one
-        #grad of w
-        gradients.append(np.dot(grad_so_far, dz_dw))
-        #grad of b
-        gradients.append(grad_so_far)
-        index +=1
+                #grad of w
+                gradients.append(np.outer(grad_so_far, dz_dw))
+                #grad of b
+                gradients.append(grad_so_far)
+    rev_grad = []
+    for w, b in zip(gradients[0::2], gradients[1::2]):
+        rev_grad.append(b)
+        rev_grad.append(w)
 
-
-    return loss, gradients.reverse()
+    return loss, list(reversed(rev_grad))
 
 def create_classifier(dims):
     """
