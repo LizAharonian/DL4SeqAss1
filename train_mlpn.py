@@ -65,7 +65,6 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
             # and the learning rate.
             for i, param in enumerate(params):
                 param -=learning_rate* grads[i]
-                #print i
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params)
@@ -91,7 +90,6 @@ if __name__ == '__main__':
     # YOUR CODE HERE
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
-
     params = ml.create_classifier([len(ut.F2I), HIDDEN_SIZE1,HIDDEN_SIZE2,len(ut.L2I)])
     trained_params = train_classifier(ut.TRAIN, ut.DEV, EPOCHS, ETA, params)
     run_test(ut.TRAIN,trained_params)
