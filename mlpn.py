@@ -53,25 +53,29 @@ def loss_and_gradients(x, y, params):
     gradients.append(grad_so_far)
     # grad of wn
     gradients.append(np.dot(grad_so_far, h_s.pop()))
-    #grad of all params
+    #compute grad of all params
+    W_s = [num for num in params if params.index(num) % 2 == 1]
+    b_s = [num for num in params if params.index(num) % 2 == 0]
+    W_s = W_s.reverse()
+    b_s = b_s.reverse()
+    index = 0
+    for W,b in zip(W_s, b_s):
+        z_i = z_s.pop()
+        w_i_plus_one =W_s[index]
+        h_i_minus_one = h_s.pop()
 
-    for W,b in zip(params, params[1:]):
-        z_i =
-        w_i_plus_one =
-        h_i_minus_one =
-
-        dh_dz = 1-np.square(np.tanh(z_i))
         dz_dh = w_i_plus_one
-        grad_so_far = np.dot(np.dot(grad_so_far,dh_dz),dz_dh)
-
+        dh_dz = 1-np.square(np.tanh(z_i))
+        grad_so_far = np.dot(np.dot(grad_so_far,dz_dh),dh_dz)
 
         dz_dw = h_i_minus_one
+        #grad of w
+        gradients.append(np.dot(grad_so_far, dz_dw))
+        #grad of b
+        gradients.append(grad_so_far)
+        index +=1
 
 
-
-
-    for i in range(len(params)-1, -1, -1):
-    gradients.append(np.dot(grad_so_far,hidden_layers[]))
     return loss, gradients.reverse()
 
 def create_classifier(dims):
