@@ -4,21 +4,32 @@ import loglinear as ll
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
 PRECISION = 1e-4
-h_s = []
-z_s = []
+
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
     h = x
-    h_s.append(h)
     for i in range(0,len(params),2):
         z = np.dot(h,params[i]) +params[i+1]
+        h = np.tanh(z)
+    probs = ll.softmax(z)
+    return probs
+
+def fp(x, params):
+    # YOUR CODE HERE.
+    h_s = []
+    z_s = []
+    h = x
+    h_s.append(h)
+    for i in range(0, len(params), 2):
+        z = np.dot(h, params[i]) + params[i + 1]
         z_s.append(z)
         h = np.tanh(z)
         h_s.append(h)
     h_s.pop()
-    probs = ll.softmax(z_s.pop())
-    return probs
+    z_s.pop()
+    return h_s, z_s
+
 
 def predict(x, params):
     return np.argmax(classifier_output(x, params))
@@ -42,17 +53,18 @@ def loss_and_gradients(x, y, params):
     """
     # YOU CODE HERE
     probs = classifier_output(x, params)  # pred vec
+    h_s, z_s = fp(x,params)
     loss = -np.log(probs[y])
     gradients = []
     y_one_hot = np.zeros(len(probs))
     y_one_hot[y] = 1
     grad_so_far = -(y_one_hot - probs)
     # grad of wn
-    gradients.append(np.outer(grad_so_far, h_s.pop()))
+    gradients.append(np.outer(h_s.pop(),grad_so_far))
 
     #grad of bn
     gradients.append(np.copy(grad_so_far))
-    print "lizzzzzzzzzz"
+    #print "lizzzzzzzzzz" + " h:"+str(len(h_s))+" s:"+str(len(z_s))
     #compute grad of all params
     for i, (w, b) in enumerate(zip(params[-2::-2], params[-1::-2])):
         #our params
@@ -65,14 +77,14 @@ def loss_and_gradients(x, y, params):
                 dz_dh = w_i_plus_one
                 dh_dz = 1-np.square(np.tanh(z_i))
                 dz_dw = h_i_minus_one
-                print np.shape(grad_so_far), np.shape(dz_dh), np.shape(dh_dz)
+                #print np.shape(grad_so_far), np.shape(dz_dh), np.shape(dh_dz)
 
                 grad_so_far = np.dot(grad_so_far,np.transpose(dz_dh)) * dh_dz
 
                 #grad of w
-                gradients.append(np.outer(grad_so_far, dz_dw))
+                gradients.append(np.outer(dz_dw,grad_so_far))
                 #grad of b
-                gradients.append(grad_so_far)
+                gradients.append(np.copy(grad_so_far))
     rev_grad = []
     for w, b in zip(gradients[0::2], gradients[1::2]):
         rev_grad.append(b)
@@ -103,7 +115,9 @@ def create_classifier(dims):
     print dims
     params = []
     for dim1,dim2 in zip(dims,dims[1:]):
-        params.append(np.random.uniform(-PRECISION, PRECISION,[dim1,dim2]))
-        params.append(np.random.uniform(-PRECISION,PRECISION,dim2))
+        eps = np.sqrt(6) / (np.sqrt(dim1 + dim2))
+        params.append(np.random.uniform(-eps, eps,[dim1,dim2]))
+        eps = np.sqrt(6) / (np.sqrt(dim2))
+        params.append(np.random.uniform(-eps,eps,dim2))
     return params
 
