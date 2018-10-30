@@ -4,8 +4,6 @@ import loglinear as ll
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
 
-PRECISION = 1e-4
-
 def classifier_output(x, params):
     # YOUR CODE HERE.
     W = params[0]
@@ -61,10 +59,14 @@ def create_classifier(in_dim, hid_dim, out_dim):
     return:
     a flat list of 4 elements, W, b, U, b_tag.
     """
-    W = np.random.uniform(-PRECISION,PRECISION,[hid_dim, in_dim])
-    b = np.random.uniform(-PRECISION,PRECISION,hid_dim)
-    U = np.random.uniform(-PRECISION,PRECISION,[out_dim, hid_dim])
-    b_tag = np.random.uniform(-PRECISION,PRECISION,out_dim)
+    eps = np.sqrt(6) / (np.sqrt(hid_dim + in_dim))
+    W = np.random.uniform(-eps,eps,[hid_dim, in_dim])
+    eps = np.sqrt(6) / (np.sqrt(hid_dim))
+    b = np.random.uniform(-eps,eps,hid_dim)
+    eps = np.sqrt(6) / (np.sqrt(out_dim+hid_dim))
+    U = np.random.uniform(-eps,eps,[out_dim, hid_dim])
+    eps = np.sqrt(6) / (np.sqrt(out_dim))
+    b_tag = np.random.uniform(-eps,eps,out_dim)
 
     params = [W,b,U,b_tag]
     return params

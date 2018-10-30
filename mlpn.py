@@ -3,8 +3,6 @@ import loglinear as ll
 
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
-PRECISION = 1e-4
-
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
@@ -16,7 +14,7 @@ def classifier_output(x, params):
     return probs
 
 def fp(x, params):
-    # YOUR CODE HERE.
+    # make the layers params
     h_s = []
     z_s = []
     h = x
@@ -59,15 +57,14 @@ def loss_and_gradients(x, y, params):
     y_one_hot = np.zeros(len(probs))
     y_one_hot[y] = 1
     grad_so_far = -(y_one_hot - probs)
+
     # grad of wn
     gradients.append(np.outer(h_s.pop(),grad_so_far))
 
     #grad of bn
     gradients.append(np.copy(grad_so_far))
-    #print "lizzzzzzzzzz" + " h:"+str(len(h_s))+" s:"+str(len(z_s))
     #compute grad of all params
     for i, (w, b) in enumerate(zip(params[-2::-2], params[-1::-2])):
-        #our params
         if (len(z_s)!=0):
             z_i = z_s.pop()
             w_i_plus_one =w
@@ -77,8 +74,6 @@ def loss_and_gradients(x, y, params):
                 dz_dh = w_i_plus_one
                 dh_dz = 1-np.square(np.tanh(z_i))
                 dz_dw = h_i_minus_one
-                #print np.shape(grad_so_far), np.shape(dz_dh), np.shape(dh_dz)
-
                 grad_so_far = np.dot(grad_so_far,np.transpose(dz_dh)) * dh_dz
 
                 #grad of w

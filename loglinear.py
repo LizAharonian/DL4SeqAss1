@@ -61,13 +61,8 @@ def loss_and_gradients(x, y, params):
     probs = classifier_output(x,params) #pred vec
     loss = -np.log(probs[y])
     #compute the gradients
-    number_of_classes = np.shape(W)[1] #get number of cols in w
     gb = probs.copy()
     gb[y] -= 1
-    # liz = np.transpose(x)
-    # o = np.shape(x)
-    # la = np.shape(liz)
-    # le = np.shape(gb)
     gW = np.outer(x,gb)
     return loss, [gW, gb]
 

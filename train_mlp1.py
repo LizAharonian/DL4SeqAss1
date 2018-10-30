@@ -77,7 +77,6 @@ def run_test(test_data, params):
     for label, features in test_data:
         x = feats_to_vec(features)  # convert features to a vector.
         y_hat = ml.predict(x, params)
-        #label = [label for label, num in ut.L2I.iteritems() if num == y_hat][0]
         for key, val in ut.L2I.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
             if val == y_hat:
                 label = key
